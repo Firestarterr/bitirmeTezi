@@ -75,4 +75,9 @@ public class File extends BitBaseEntity {
     public void setDeveloperChangeCountMap(Map<Developer, Integer> developerChangeCountMap) {
         this.developerChangeCountMap = developerChangeCountMap;
     }
+
+    @Override
+    public String toString() {
+        return getName() + "." + getFileExt();
+    }
 }

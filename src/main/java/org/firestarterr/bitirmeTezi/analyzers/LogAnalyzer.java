@@ -19,8 +19,8 @@ public class LogAnalyzer {
         OrcaAnalyzer orcaAnalyzer = new OrcaAnalyzer();
         orcaAnalyzer.run();
 
-//        TranetAnalyzer tranetAnalyzer = new TranetAnalyzer();
-//        tranetAnalyzer.run();
+        TranetAnalyzer tranetAnalyzer = new TranetAnalyzer();
+        tranetAnalyzer.run();
 
         System.out.println("analyze-ended.");
     }
