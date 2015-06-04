@@ -424,7 +424,7 @@ public abstract class BaseAnalyzer {
         }
     }
 
-    public void exportData() throws IOException {
+    public void exportDeveloperData() throws IOException {
 
         FileWriter fw = new FileWriter(projects.get(0).getName() + "-developers.csv");
         BufferedWriter bw = new BufferedWriter(fw);
@@ -471,6 +471,53 @@ public abstract class BaseAnalyzer {
             sb.append(totalEditedLoc);
             sb.append(",");
             sb.append(totalEditedLoc / dev.getCommits().size());
+            sb.append(",");
+
+            bw.write(sb.toString());
+            bw.newLine();
+        }
+        bw.close();
+        fw.close();
+    }
+
+    public void exportFileData() throws IOException {
+
+        FileWriter fw = new FileWriter(projects.get(0).getName() + "-files.csv");
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.newLine();
+        for (File file : files) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(buildEntityStaticFieldsString(file));
+            sb.append(file.getFullPath());
+            sb.append(",");
+            sb.append(file.getFileExt());
+            sb.append(",");
+            sb.append(file.getModule());
+            sb.append(",");
+
+            Map<Developer, Integer> developerCommitCountMap = new HashMap<>();
+            for (Commit commit : file.getCommits()) {
+                if (developerCommitCountMap.containsKey(commit.getDeveloper())) {
+                    Integer commitCount = developerCommitCountMap.get(commit.getDeveloper());
+                    developerCommitCountMap.put(commit.getDeveloper(), commitCount + 1);
+                } else {
+                    developerCommitCountMap.put(commit.getDeveloper(), 1);
+                }
+            }
+            Map.Entry<Developer, Integer> topDeveloper = null;
+            for (Map.Entry<Developer, Integer> entry : developerCommitCountMap.entrySet()) {
+                if (topDeveloper == null || topDeveloper.getValue() < entry.getValue()) {
+                    topDeveloper = entry;
+                }
+            }
+            sb.append(topDeveloper.getKey().getName());
+            sb.append(",");
+
+            sb.append(file.getLocEdited());
+            sb.append(",");
+            sb.append(file.getCommits().size());
+            sb.append(",");
+            sb.append(((double) file.getLocEdited()) / ((double) file.getCommits().size()));
             sb.append(",");
 
             bw.write(sb.toString());

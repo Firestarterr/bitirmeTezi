@@ -23,9 +23,13 @@ public class LogAnalyzer {
         tranetAnalyzer.run();
 
 
-        hysAnalyzer.exportData();
-        orcaAnalyzer.exportData();
-        tranetAnalyzer.exportData();
+        hysAnalyzer.exportDeveloperData();
+        orcaAnalyzer.exportDeveloperData();
+        tranetAnalyzer.exportDeveloperData();
+
+        hysAnalyzer.exportFileData();
+        orcaAnalyzer.exportFileData();
+        tranetAnalyzer.exportFileData();
 
         System.out.println("analyze-ended.");
     }
