@@ -1,4 +1,4 @@
-package org.firestarterr.bitirmeTezi.xmlmodals;
+package org.firestarterr.bitirmeTezi.analyzers.xmlmodals;
 
 import java.util.ArrayList;
 import java.util.List;

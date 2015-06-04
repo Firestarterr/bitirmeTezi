@@ -1,10 +1,14 @@
 package org.firestarterr.bitirmeTezi.analyzers;
 
+import org.exolab.castor.mapping.MappingException;
+import org.exolab.castor.xml.MarshalException;
+import org.exolab.castor.xml.ValidationException;
 import org.firestarterr.bitirmeTezi.analyzers.wrappers.CommitWrapper;
 import org.firestarterr.bitirmeTezi.analyzers.wrappers.FileWrapper;
 import org.firestarterr.bitirmeTezi.model.*;
 import org.firestarterr.bitirmeTezi.model.Package;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
 
@@ -28,6 +32,8 @@ public abstract class BaseAnalyzer {
         packages.add(aPackage);
     }
 
+    public abstract void run() throws IOException, MappingException, MarshalException, ValidationException, ParseException;
+
     //<editor-fold desc="Package Methods">
     protected abstract String getPackageName(String path);
 
@@ -41,6 +47,7 @@ public abstract class BaseAnalyzer {
             String packageName = getPackageName(path);
             for (Package aPackage : packages) {
                 if (aPackage.getName().equals(packageName)) {
+                    updateStats(aPackage, date, isOrcaDeveloper);
                     return aPackage;
                 }
             }
@@ -85,6 +92,9 @@ public abstract class BaseAnalyzer {
 
     private File findOrCreateFile(String fileString, Date date, boolean isOrcaDeveloper) {
         FileWrapper parsed = parseFileString(fileString);
+        if (parsed == null) {
+            return null;
+        }
         for (File file : files) {
             if (file.getName().equals(parsed.name)) {
                 updateStats(file, date, isOrcaDeveloper);
@@ -209,6 +219,9 @@ public abstract class BaseAnalyzer {
 
     private void updateCommitFiles(Commit commit, String fileString, Integer locEdited) {
         File file = findOrCreateFile(fileString, commit.getCommitDate(), commit.getDeveloper().getIsOrcaDeveloper());
+        if (file == null) {
+            return;
+        }
         commit.getFiles().add(file);
         file.getCommits().add(commit);
         updateCommitStats(commit, locEdited);

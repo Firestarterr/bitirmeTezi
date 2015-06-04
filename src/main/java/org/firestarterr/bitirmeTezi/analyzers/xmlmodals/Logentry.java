@@ -1,20 +1,11 @@
-package org.firestarterr.bitirmeTezi.xmlmodals;
+package org.firestarterr.bitirmeTezi.analyzers.xmlmodals;
 
 public class Logentry {
 
-    public String revision;
-    public String author;
-    public String date;
+    private String author;
+    private String date;
     private Paths paths;
-    public String msg;
-
-    public String getRevision() {
-        return revision;
-    }
-
-    public void setRevision(String revision) {
-        this.revision = revision;
-    }
+    private String msg;
 
     public String getAuthor() {
         return author;

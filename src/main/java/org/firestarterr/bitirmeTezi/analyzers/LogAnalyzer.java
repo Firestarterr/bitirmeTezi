@@ -16,11 +16,11 @@ public class LogAnalyzer {
         HysAnalyzer hysAnalyzer = new HysAnalyzer();
         hysAnalyzer.run();
 
-        OrcaAnalyzer orcaAnalyzer = new OrcaAnalyzer();
-        orcaAnalyzer.run();
-
-        TranetAnalyzer tranetAnalyzer = new TranetAnalyzer();
-        tranetAnalyzer.run();
+//        OrcaAnalyzer orcaAnalyzer = new OrcaAnalyzer();
+//        orcaAnalyzer.run();
+//
+//        TranetAnalyzer tranetAnalyzer = new TranetAnalyzer();
+//        tranetAnalyzer.run();
 
         System.out.println("analyze-ended.");
     }
