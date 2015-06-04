@@ -22,6 +22,11 @@ public class LogAnalyzer {
         TranetAnalyzer tranetAnalyzer = new TranetAnalyzer();
         tranetAnalyzer.run();
 
+
+        hysAnalyzer.exportData();
+        orcaAnalyzer.exportData();
+        tranetAnalyzer.exportData();
+
         System.out.println("analyze-ended.");
     }
 

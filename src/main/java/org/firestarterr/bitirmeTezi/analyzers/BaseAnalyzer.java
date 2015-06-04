@@ -8,6 +8,8 @@ import org.firestarterr.bitirmeTezi.analyzers.wrappers.FileWrapper;
 import org.firestarterr.bitirmeTezi.model.*;
 import org.firestarterr.bitirmeTezi.model.Package;
 
+import java.io.BufferedWriter;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.*;
@@ -210,11 +212,6 @@ public abstract class BaseAnalyzer {
     //</editor-fold>
 
     //<editor-fold desc="Util Methods">
-    private Integer getDifferenceAsDays(Date date1, Date date2) {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(Math.abs(date2.getTime() - date1.getTime()));
-        return cal.get(Calendar.DAY_OF_YEAR);
-    }
 
     private void updateStats(BitBaseEntity entity, Date date, boolean isOrcaDeveloper) {
         if (entity.getUpdatedDate() == null) {
@@ -222,16 +219,16 @@ public abstract class BaseAnalyzer {
         }
         entity.increaseRecordCount();
         entity.setCreatedDate(date);
-        Integer differenceAsDay = getDifferenceAsDays(entity.getCreatedDate(), entity.getUpdatedDate());
-        entity.setChangeFrequencyPerDay((double) (entity.getRecordCount() / differenceAsDay));
+        Integer differenceAsDay = entity.getAge();
+        entity.setChangeFrequencyPerDay(((double) entity.getRecordCount()) / ((double) differenceAsDay));
         if (isOrcaDeveloper) {
             if (entity.getRelUpdatedDate() == null) {
                 entity.setRelUpdatedDate(date);
             }
             entity.increaseRelRecordCount();
             entity.setRelCreatedDate(date);
-            Integer relDifferenceAsDay = getDifferenceAsDays(entity.getRelCreatedDate(), entity.getRelUpdatedDate());
-            entity.setRelChangeFrequencyPerDay((double) (entity.getRelRecordCount() / relDifferenceAsDay));
+            Integer relDifferenceAsDay = entity.getRelAge();
+            entity.setRelChangeFrequencyPerDay(((double) entity.getRelRecordCount()) / ((double) relDifferenceAsDay));
         }
     }
     //</editor-fold>
@@ -429,15 +426,80 @@ public abstract class BaseAnalyzer {
 
     public void exportData() throws IOException {
 
-//        FileWriter fw = new FileWriter(projects.get(0).getName() + "-developers.csv");
-//        BufferedWriter bw = new BufferedWriter(fw);
-//        for (Developer dev : developers) {
-//            StringBuilder sb = new StringBuilder();
-//            sb.append(dev.getName());
-//            sb.append(",");
-//            bw.newLine();
-//        }
-//        bw.close();
-//        fw.close();
+        FileWriter fw = new FileWriter(projects.get(0).getName() + "-developers.csv");
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.newLine();
+        for (Developer dev : developers) {
+            StringBuilder sb = new StringBuilder();
+            sb.append(buildEntityStaticFieldsString(dev));
+            sb.append(dev.getCommits().size());
+            sb.append(",");
+
+            Double totalCoop = 0D;
+            for (Map.Entry<Developer, Integer> entry : dev.getCooperationCount().entrySet()) {
+                totalCoop = totalCoop + entry.getValue();
+            }
+            sb.append(totalCoop);
+            sb.append(",");
+
+            sb.append(dev.getCooperatedOnFiles().keySet().size());
+            sb.append(",");
+
+            sb.append(totalCoop / dev.getCooperatedOnFiles().keySet().size());
+            sb.append(",");
+
+            sb.append(dev.getCooperatedOnModules().keySet().size());
+            sb.append(",");
+
+            sb.append(totalCoop / dev.getCooperatedOnModules().keySet().size());
+            sb.append(",");
+
+            sb.append(dev.getCooperationCount().keySet().size());
+            sb.append(",");
+
+
+            sb.append(totalCoop / dev.getCooperationCount().keySet().size());
+            sb.append(",");
+
+            Double totalEditedLoc = 0D;
+            for (Commit commit : dev.getCommits()) {
+                if (commit.getFiles() != null) {
+                    totalEditedLoc = totalEditedLoc + commit.getFiles().size();
+                }
+            }
+
+            sb.append(totalEditedLoc);
+            sb.append(",");
+            sb.append(totalEditedLoc / dev.getCommits().size());
+            sb.append(",");
+
+            bw.write(sb.toString());
+            bw.newLine();
+        }
+        bw.close();
+        fw.close();
+    }
+
+    private String buildEntityStaticFieldsString(BitBaseEntity entity) {
+        StringBuilder sb = new StringBuilder();
+        sb.append(entity.getName());
+        sb.append(",");
+        sb.append(entity.getAge());
+        sb.append(",");
+        sb.append(entity.getRelAge());
+        sb.append(",");
+        sb.append(entity.getCreatedDate());
+        sb.append(",");
+        sb.append(entity.getUpdatedDate());
+        sb.append(",");
+        sb.append(entity.getRelCreatedDate());
+        sb.append(",");
+        sb.append(entity.getRelUpdatedDate());
+        sb.append(",");
+        sb.append(entity.getChangeFrequencyPerDay());
+        sb.append(",");
+        sb.append(entity.getRelChangeFrequencyPerDay());
+        sb.append(",");
+        return sb.toString();
     }
 }
