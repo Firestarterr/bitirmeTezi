@@ -24,19 +24,32 @@ public class OrcaAnalyzer extends BaseGitAnalyzer {
         BufferedReader br = new BufferedReader(fr);
         String line;
         CommitWrapper parsed = null;
+        boolean isYunus = false;
         while ((line = br.readLine()) != null) {
             if (line.contains("*-*-")) {
-                if (parsed != null) {
-                    createCommit(parsed);
+                if (line.contains("yunusalkan")) {
+                    isYunus = true;
+                } else {
+                    isYunus = false;
                 }
-                parsed = parseCommitData(line);
-            } else if (line.contains("|")) {
-                parseCommitFileData(parsed, line);
+            }
+            if (!isYunus) {
+                if (line.contains("*-*-")) {
+                    if (parsed != null) {
+                        createCommit(parsed);
+                    }
+                    parsed = parseCommitData(line);
+                } else if (line.contains("|")) {
+                    parseCommitFileData(parsed, line);
+                }
             }
         }
+
         br.close();
         fr.close();
+
         analyzeData();
+
         System.out.println("orca-report-ended.");
     }
 

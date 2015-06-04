@@ -21,6 +21,8 @@ public abstract class BaseAnalyzer {
     List<Developer> developers = new ArrayList<>();
     List<Commit> commitSuccess = new ArrayList<>();
 
+    Map<String, List<File>> fileExtMap = new HashMap<>();
+
     public BaseAnalyzer(String projectName) {
         Project project = new Project();
         project.setName(projectName);
@@ -95,6 +97,9 @@ public abstract class BaseAnalyzer {
         if (parsed == null) {
             return null;
         }
+        if (!isFileExtCovered(parsed.ext)) {
+            return null;
+        }
         for (File file : files) {
             if (file.getName().equals(parsed.name)) {
                 updateStats(file, date, isOrcaDeveloper);
@@ -104,6 +109,26 @@ public abstract class BaseAnalyzer {
         File file = createFile(parsed, date, isOrcaDeveloper);
         files.add(file);
         return file;
+    }
+
+    private boolean isFileExtCovered(String ext) {
+        boolean check = false;
+        if (ext.equals("java")) {
+            check = true;
+        }
+        if (ext.equals("xhtml")) {
+            check = true;
+        }
+        if (ext.equals("css")) {
+            check = true;
+        }
+        if (ext.equals("js")) {
+            check = true;
+        }
+        if (ext.equals("wsdl")) {
+            check = true;
+        }
+        return check;
     }
 
     private File createFile(FileWrapper parsed, Date date, boolean isOrcaDeveloper) {
@@ -390,9 +415,29 @@ public abstract class BaseAnalyzer {
                 }
             }
         }
+
+        for (File file : files) {
+            if (fileExtMap.containsKey(file.getFileExt())) {
+                fileExtMap.get(file.getFileExt()).add(file);
+            } else {
+                List<File> newList = new ArrayList<>();
+                newList.add(file);
+                fileExtMap.put(file.getFileExt(), newList);
+            }
+        }
     }
 
-    public void exportData() {
-        //TODO buraya export metodu yazilmali
+    public void exportData() throws IOException {
+
+//        FileWriter fw = new FileWriter(projects.get(0).getName() + "-developers.csv");
+//        BufferedWriter bw = new BufferedWriter(fw);
+//        for (Developer dev : developers) {
+//            StringBuilder sb = new StringBuilder();
+//            sb.append(dev.getName());
+//            sb.append(",");
+//            bw.newLine();
+//        }
+//        bw.close();
+//        fw.close();
     }
 }
