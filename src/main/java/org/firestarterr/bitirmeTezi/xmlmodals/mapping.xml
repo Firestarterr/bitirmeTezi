@@ -1,0 +1,30 @@
+<?xml version="1.0"?>
+
+<mapping>
+    <class name="org.orcateam.tranet.core.bitirme.xmlmodals.Logentry">
+        <map-to xml="logentry"/>
+
+        <field name="revision" type="java.lang.String">
+            <bind-xml name="revision" node="attribute"/>
+        </field>
+        <field name="author" type="java.lang.String">
+            <bind-xml name="author" node="element"/>
+        </field>
+        <field name="date" type="java.lang.String">
+            <bind-xml name="date" node="element"/>
+        </field>
+        <field name="paths" type="org.orcateam.tranet.core.bitirme.xmlmodals.Paths">
+            <bind-xml name="paths" node="element"/>
+        </field>
+        <field name="msg" type="java.lang.String">
+            <bind-xml name="msg" node="element"/>
+        </field>
+    </class>
+    <class name="org.orcateam.tranet.core.bitirme.xmlmodals.Paths">
+        <map-to xml="paths"/>
+
+        <field name="path" type="java.lang.String" collection="arraylist">
+            <bind-xml name="path" node="element"/>
+        </field>
+    </class>
+</mapping>
