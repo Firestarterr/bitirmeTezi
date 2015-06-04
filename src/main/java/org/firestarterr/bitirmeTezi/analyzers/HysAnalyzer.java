@@ -24,7 +24,9 @@ public class HysAnalyzer extends BaseAnalyzer {
         super("HYS");
     }
 
+    @Override
     public void run() throws IOException, MappingException, MarshalException, ValidationException, ParseException {
+
         FileReader reader = new FileReader("C:\\Users\\murat\\Desktop\\workspace\\hysbitirme\\log.txt");
 
         // Define mapping.xml file address

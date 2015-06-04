@@ -155,15 +155,31 @@ public abstract class BaseAnalyzer {
         if (name.equals("murats")) {
             newName = "Murat Can Sayılgan";
         }
+
         if (name.equals("recepa")) {
             newName = "Recep Ayan";
         }
-        if (name.equals("kamilo")) {
-            newName = "Kamil Örs";
+        if (name.equals("rcpayan")) {
+            newName = "Recep Ayan";
         }
+
         if (name.equals("elifg")) {
             newName = "Elif Gül";
         }
+        if (name.equals("elif")) {
+            newName = "Elif Gül";
+        }
+
+        if (name.equals("kamilo")) {
+            newName = "Kamil Örs";
+        }
+        if (name.equals("kamilors")) {
+            newName = "Kamil Örs";
+        }
+        if (name.equals("Kamil Ors")) {
+            newName = "Kamil Örs";
+        }
+
         return newName;
     }
     //</editor-fold>
@@ -209,8 +225,10 @@ public abstract class BaseAnalyzer {
             commit.setRelatedIssue(findOrCreateIssue(parsed.issueName, parsed.date, dev.getIsOrcaDeveloper()));
         }
 
-        for (Map.Entry<String, Integer> entry : parsed.fileStrings.entrySet()) {
-            updateCommitFiles(commit, entry.getKey(), entry.getValue());
+        if (parsed.fileStrings != null) {
+            for (Map.Entry<String, Integer> entry : parsed.fileStrings.entrySet()) {
+                updateCommitFiles(commit, entry.getKey(), entry.getValue());
+            }
         }
 
         commitSuccess.add(commit);
@@ -255,7 +273,6 @@ public abstract class BaseAnalyzer {
         }
     }
     //</editor-fold>
-
 
     public void analyzeData() {
         for (Commit commit : commitSuccess) {
@@ -373,5 +390,9 @@ public abstract class BaseAnalyzer {
                 }
             }
         }
+    }
+
+    public void exportData() {
+        //TODO buraya export metodu yazilmali
     }
 }

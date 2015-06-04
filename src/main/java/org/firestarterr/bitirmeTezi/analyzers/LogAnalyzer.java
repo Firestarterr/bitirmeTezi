@@ -16,9 +16,9 @@ public class LogAnalyzer {
         HysAnalyzer hysAnalyzer = new HysAnalyzer();
         hysAnalyzer.run();
 
-//        OrcaAnalyzer orcaAnalyzer = new OrcaAnalyzer();
-//        orcaAnalyzer.run();
-//
+        OrcaAnalyzer orcaAnalyzer = new OrcaAnalyzer();
+        orcaAnalyzer.run();
+
 //        TranetAnalyzer tranetAnalyzer = new TranetAnalyzer();
 //        tranetAnalyzer.run();
 
