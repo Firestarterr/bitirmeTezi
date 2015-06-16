@@ -22,6 +22,8 @@ public abstract class BaseAnalyzer {
     List<File> files = new ArrayList<>();
     List<Developer> developers = new ArrayList<>();
     List<Commit> commitSuccess = new ArrayList<>();
+    List<Commit> commitsWithIssues = new ArrayList<>();
+    List<Commit> commitsWithoutIssues = new ArrayList<>();
 
     Map<String, List<File>> fileExtMap = new HashMap<>();
 
@@ -242,6 +244,7 @@ public abstract class BaseAnalyzer {
         commit.setCommitDate(parsed.date);
         commit.setDeveloper(dev);
         commit.setName(parsed.commitName);
+        commit.setProject(projects.get(0));
 
         if (parsed.issueName != null) {
             commit.setRelatedIssue(findOrCreateIssue(parsed.issueName, parsed.date, dev.getIsOrcaDeveloper()));
@@ -306,6 +309,12 @@ public abstract class BaseAnalyzer {
                 } else {
                     file.getDeveloperChangeCountMap().put(dev, 1);
                 }
+            }
+            updateStats(commit.getProject(), commit.getCommitDate(), commit.getDeveloper().getIsOrcaDeveloper());
+            if (commit.getRelatedIssue() != null) {
+                commitsWithIssues.add(commit);
+            } else {
+                commitsWithoutIssues.add(commit);
             }
         }
 
@@ -424,6 +433,13 @@ public abstract class BaseAnalyzer {
         }
     }
 
+    //<editor-fold desc="Report Methods">
+    public void produceReports() throws IOException {
+        exportFileData();
+        exportDeveloperData();
+        exportDeveloperMatrixData();
+    }
+
     public void exportDeveloperData() throws IOException {
 
         FileWriter fw = new FileWriter(projects.get(0).getName() + "-developers.csv");
@@ -510,9 +526,10 @@ public abstract class BaseAnalyzer {
                     topDeveloper = entry;
                 }
             }
-            sb.append(topDeveloper.getKey().getName());
-            sb.append(",");
-
+            if (topDeveloper != null) {
+                sb.append(topDeveloper.getKey().getName());
+                sb.append(",");
+            }
             sb.append(file.getLocEdited());
             sb.append(",");
             sb.append(file.getCommits().size());
@@ -527,26 +544,40 @@ public abstract class BaseAnalyzer {
         fw.close();
     }
 
-    private String buildEntityStaticFieldsString(BitBaseEntity entity) {
+    public void exportDeveloperMatrixData() throws IOException {
+        FileWriter fw = new FileWriter(projects.get(0).getName() + "-developer-matrix.csv");
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.newLine();
         StringBuilder sb = new StringBuilder();
-        sb.append(entity.getName());
         sb.append(",");
-        sb.append(entity.getAge());
-        sb.append(",");
-        sb.append(entity.getRelAge());
-        sb.append(",");
-        sb.append(entity.getCreatedDate());
-        sb.append(",");
-        sb.append(entity.getUpdatedDate());
-        sb.append(",");
-        sb.append(entity.getRelCreatedDate());
-        sb.append(",");
-        sb.append(entity.getRelUpdatedDate());
-        sb.append(",");
-        sb.append(entity.getChangeFrequencyPerDay());
-        sb.append(",");
-        sb.append(entity.getRelChangeFrequencyPerDay());
-        sb.append(",");
-        return sb.toString();
+        for (Developer developer : developers) {
+            sb.append(developer.getName());
+            sb.append(",");
+        }
+        bw.write(sb.toString());
+        bw.newLine();
+        for (Developer developer : developers) {
+            sb = new StringBuilder();
+            sb.append(developer.getName());
+            sb.append(",");
+            for (Developer iter : developers) {
+                Integer cooperationCount = developer.getCooperationCount().get(iter);
+                if (cooperationCount == null) {
+                    sb.append("");
+                } else {
+                    sb.append(cooperationCount);
+                }
+                sb.append(",");
+            }
+            bw.write(sb.toString());
+            bw.newLine();
+        }
+        bw.close();
+        fw.close();
     }
+
+    private String buildEntityStaticFieldsString(BitBaseEntity entity) {
+        return entity.getName() + "," + entity.getAge() + "," + entity.getRelAge() + "," + entity.getCreatedDate() + "," + entity.getUpdatedDate() + "," + entity.getRelCreatedDate() + "," + entity.getRelUpdatedDate() + "," + entity.getChangeFrequencyPerDay() + "," + entity.getRelChangeFrequencyPerDay() + ",";
+    }
+    //</editor-fold>
 }
