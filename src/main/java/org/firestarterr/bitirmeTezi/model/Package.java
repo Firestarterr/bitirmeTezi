@@ -1,6 +1,6 @@
 package org.firestarterr.bitirmeTezi.model;
 
-public class Package extends BitBaseEntity {
+public class Package extends BaseEntity {
 
     private Project project;
 

@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 
-public abstract class BitBaseEntity implements Serializable {
+public abstract class BaseEntity implements Serializable {
 
     private String name;
 

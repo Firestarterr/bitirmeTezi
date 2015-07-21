@@ -215,7 +215,16 @@ public abstract class BaseAnalyzer {
 
     //<editor-fold desc="Util Methods">
 
-    private void updateStats(BitBaseEntity entity, Date date, boolean isOrcaDeveloper) {
+    private boolean isOnlyOrcaDeveloper() {
+        for (Developer developer : developers) {
+            if (!developer.getIsOrcaDeveloper()) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private void updateStats(BaseEntity entity, Date date, boolean isOrcaDeveloper) {
         if (entity.getUpdatedDate() == null) {
             entity.setUpdatedDate(date);
         }
@@ -438,6 +447,69 @@ public abstract class BaseAnalyzer {
         exportFileData();
         exportDeveloperData();
         exportDeveloperMatrixData();
+        if (!isOnlyOrcaDeveloper()) {
+            exportOrcaDeveloperData();
+            exportOrcaDeveloperMatrixData();
+        }
+    }
+
+    public void exportOrcaDeveloperData() throws IOException {
+
+        FileWriter fw = new FileWriter(projects.get(0).getName() + "-orca-developers.csv");
+        BufferedWriter bw = new BufferedWriter(fw);
+        bw.newLine();
+        for (Developer dev : developers) {
+            if (!dev.getIsOrcaDeveloper()) {
+                continue;
+            }
+            StringBuilder sb = new StringBuilder();
+            sb.append(buildEntityStaticFieldsString(dev));
+            sb.append(dev.getCommits().size());
+            sb.append(",");
+
+            Double totalCoop = 0D;
+            for (Map.Entry<Developer, Integer> entry : dev.getCooperationCount().entrySet()) {
+                totalCoop = totalCoop + entry.getValue();
+            }
+            sb.append(totalCoop);
+            sb.append(",");
+
+            sb.append(dev.getCooperatedOnFiles().keySet().size());
+            sb.append(",");
+
+            sb.append(totalCoop / dev.getCooperatedOnFiles().keySet().size());
+            sb.append(",");
+
+            sb.append(dev.getCooperatedOnModules().keySet().size());
+            sb.append(",");
+
+            sb.append(totalCoop / dev.getCooperatedOnModules().keySet().size());
+            sb.append(",");
+
+            sb.append(dev.getCooperationCount().keySet().size());
+            sb.append(",");
+
+
+            sb.append(totalCoop / dev.getCooperationCount().keySet().size());
+            sb.append(",");
+
+            Double totalEditedLoc = 0D;
+            for (Commit commit : dev.getCommits()) {
+                if (commit.getFiles() != null) {
+                    totalEditedLoc = totalEditedLoc + commit.getFiles().size();
+                }
+            }
+
+            sb.append(totalEditedLoc);
+            sb.append(",");
+            sb.append(totalEditedLoc / dev.getCommits().size());
+            sb.append(",");
+
+            bw.write(sb.toString());
+            bw.newLine();
+        }
+        bw.close();
+        fw.close();
     }
 
     public void exportDeveloperData() throws IOException {
@@ -497,7 +569,6 @@ public abstract class BaseAnalyzer {
     }
 
     public void exportFileData() throws IOException {
-
         FileWriter fw = new FileWriter(projects.get(0).getName() + "-files.csv");
         BufferedWriter bw = new BufferedWriter(fw);
         bw.newLine();
@@ -544,10 +615,49 @@ public abstract class BaseAnalyzer {
         fw.close();
     }
 
+    public void exportOrcaDeveloperMatrixData() throws IOException {
+        FileWriter fw = new FileWriter(projects.get(0).getName() + "-orca-developer-matrix.csv");
+        BufferedWriter bw = new BufferedWriter(fw);
+        StringBuilder sb = new StringBuilder();
+        sb.append(",");
+        for (Developer developer : developers) {
+            if (!developer.getIsOrcaDeveloper()) {
+                continue;
+            }
+            sb.append(developer.getName());
+            sb.append(",");
+        }
+        bw.write(sb.toString());
+        bw.newLine();
+        for (Developer developer : developers) {
+            if (!developer.getIsOrcaDeveloper()) {
+                continue;
+            }
+            sb = new StringBuilder();
+            sb.append(developer.getName());
+            sb.append(",");
+            for (Developer iter : developers) {
+                if (!iter.getIsOrcaDeveloper()) {
+                    continue;
+                }
+                Integer cooperationCount = developer.getCooperationCount().get(iter);
+                if (cooperationCount == null) {
+                    sb.append("");
+                } else {
+                    sb.append(cooperationCount);
+                }
+                sb.append(",");
+            }
+            bw.write(sb.toString());
+            bw.newLine();
+        }
+        bw.close();
+        fw.close();
+    }
+
     public void exportDeveloperMatrixData() throws IOException {
         FileWriter fw = new FileWriter(projects.get(0).getName() + "-developer-matrix.csv");
         BufferedWriter bw = new BufferedWriter(fw);
-        bw.newLine();
         StringBuilder sb = new StringBuilder();
         sb.append(",");
         for (Developer developer : developers) {
@@ -576,7 +686,7 @@ public abstract class BaseAnalyzer {
         fw.close();
     }
 
-    private String buildEntityStaticFieldsString(BitBaseEntity entity) {
+    private String buildEntityStaticFieldsString(BaseEntity entity) {
         return entity.getName() + "," + entity.getAge() + "," + entity.getRelAge() + "," + entity.getCreatedDate() + "," + entity.getUpdatedDate() + "," + entity.getRelCreatedDate() + "," + entity.getRelUpdatedDate() + "," + entity.getChangeFrequencyPerDay() + "," + entity.getRelChangeFrequencyPerDay() + ",";
     }
     //</editor-fold>

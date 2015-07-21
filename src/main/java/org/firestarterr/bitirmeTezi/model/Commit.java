@@ -2,7 +2,7 @@ package org.firestarterr.bitirmeTezi.model;
 
 import java.util.*;
 
-public class Commit extends BitBaseEntity {
+public class Commit extends BaseEntity {
 
     private Developer developer;
     private Date commitDate;

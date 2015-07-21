@@ -1,5 +1,5 @@
 package org.firestarterr.bitirmeTezi.model;
 
-public class Issue extends BitBaseEntity {
+public class Issue extends BaseEntity {
 
 }

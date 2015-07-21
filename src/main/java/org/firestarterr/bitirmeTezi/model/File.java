@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class File extends BitBaseEntity {
+public class File extends BaseEntity {
 
     private String fileExt;
     private String fullPath;

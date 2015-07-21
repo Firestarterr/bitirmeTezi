@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class Developer extends BitBaseEntity {
+public class Developer extends BaseEntity {
 
     private Integer locEdited;
     private boolean isOrcaDeveloper;
