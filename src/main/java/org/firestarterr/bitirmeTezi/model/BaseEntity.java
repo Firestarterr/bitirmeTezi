@@ -1,9 +1,8 @@
 package org.firestarterr.bitirmeTezi.model;
 
 import java.io.Serializable;
-import java.util.Calendar;
 import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.concurrent.TimeUnit;
 
 public abstract class BaseEntity implements Serializable {
 
@@ -107,19 +106,17 @@ public abstract class BaseEntity implements Serializable {
         relRecordCount++;
     }
 
-    public Integer getAge() {
-        GregorianCalendar cal = new GregorianCalendar();
-        cal.setTimeInMillis(Math.abs(createdDate.getTime() - updatedDate.getTime()));
-        return cal.get(Calendar.DAY_OF_YEAR);
+    public long getAge() {
+        long diff = updatedDate.getTime() - createdDate.getTime();
+        return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
     }
 
-    public Integer getRelAge() {
+    public long getRelAge() {
         if (relCreatedDate != null) {
-            GregorianCalendar cal = new GregorianCalendar();
-            cal.setTimeInMillis(Math.abs(relCreatedDate.getTime() - relUpdatedDate.getTime()));
-            return cal.get(Calendar.DAY_OF_YEAR);
+            long diff = relUpdatedDate.getTime() - relCreatedDate.getTime();
+            return TimeUnit.DAYS.convert(diff, TimeUnit.MILLISECONDS);
         } else {
-            return 0;
+            return 0L;
         }
     }
 

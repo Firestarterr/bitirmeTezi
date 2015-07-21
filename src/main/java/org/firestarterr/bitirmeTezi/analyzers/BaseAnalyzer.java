@@ -211,13 +211,17 @@ public abstract class BaseAnalyzer {
 
         return newName;
     }
+
+    private boolean isDeveloperValid(Developer developer) {
+        return !(developer.getName().equals("sonerk") || developer.getName().equals("kerimc") || developer.getName().equals("zeynepb") || developer.getName().equals("dilekk"));
+    }
     //</editor-fold>
 
     //<editor-fold desc="Util Methods">
 
     private boolean isOnlyOrcaDeveloper() {
         for (Developer developer : developers) {
-            if (!developer.getIsOrcaDeveloper()) {
+            if (!isDeveloperValid(developer) || !developer.getIsOrcaDeveloper()) {
                 return false;
             }
         }
@@ -225,27 +229,34 @@ public abstract class BaseAnalyzer {
     }
 
     private void updateStats(BaseEntity entity, Date date, boolean isOrcaDeveloper) {
-        if (entity.getUpdatedDate() == null) {
+        if (entity.getUpdatedDate() == null || entity.getUpdatedDate().before(date)) {
             entity.setUpdatedDate(date);
         }
         entity.increaseRecordCount();
-        entity.setCreatedDate(date);
-        Integer differenceAsDay = entity.getAge();
-        entity.setChangeFrequencyPerDay(((double) entity.getRecordCount()) / ((double) differenceAsDay));
+        if (entity.getCreatedDate() == null || entity.getCreatedDate().after(date)) {
+            entity.setCreatedDate(date);
+        }
+        long differenceAsDay = entity.getAge();
+        entity.setChangeFrequencyPerDay(((double) entity.getRecordCount()) / differenceAsDay);
         if (isOrcaDeveloper) {
-            if (entity.getRelUpdatedDate() == null) {
+            if (entity.getRelUpdatedDate() == null || entity.getRelUpdatedDate().before(date)) {
                 entity.setRelUpdatedDate(date);
             }
             entity.increaseRelRecordCount();
-            entity.setRelCreatedDate(date);
-            Integer relDifferenceAsDay = entity.getRelAge();
-            entity.setRelChangeFrequencyPerDay(((double) entity.getRelRecordCount()) / ((double) relDifferenceAsDay));
+            if (entity.getRelCreatedDate() == null || entity.getRelCreatedDate().after(date)) {
+                entity.setRelCreatedDate(date);
+            }
+            long relDifferenceAsDay = entity.getRelAge();
+            entity.setRelChangeFrequencyPerDay(((double) entity.getRelRecordCount()) / relDifferenceAsDay);
         }
     }
     //</editor-fold>
 
     //<editor-fold desc="Commit Methods">
     protected Commit createCommit(CommitWrapper parsed) throws ParseException {
+        if (isCommitValid(parsed)) {
+            return null;
+        }
         Commit commit = new Commit();
         Developer dev = findOrCreateDeveloper(parsed.dev, parsed.date);
         dev.getCommits().add(commit);
@@ -267,6 +278,10 @@ public abstract class BaseAnalyzer {
 
         commitSuccess.add(commit);
         return commit;
+    }
+
+    private boolean isCommitValid(CommitWrapper parsed) {
+        return !"Style copy problem on iteration for font family and default font size is fixed.".equals(parsed.commitName);
     }
 
     private void updateCommitFiles(Commit commit, String fileString, Integer locEdited) {
@@ -459,7 +474,7 @@ public abstract class BaseAnalyzer {
         BufferedWriter bw = new BufferedWriter(fw);
         bw.newLine();
         for (Developer dev : developers) {
-            if (!dev.getIsOrcaDeveloper()) {
+            if (!isDeveloperValid(dev) || !dev.getIsOrcaDeveloper()) {
                 continue;
             }
             StringBuilder sb = new StringBuilder();
@@ -518,6 +533,9 @@ public abstract class BaseAnalyzer {
         BufferedWriter bw = new BufferedWriter(fw);
         bw.newLine();
         for (Developer dev : developers) {
+            if (!isDeveloperValid(dev)) {
+                continue;
+            }
             StringBuilder sb = new StringBuilder();
             sb.append(buildEntityStaticFieldsString(dev));
             sb.append(dev.getCommits().size());
@@ -621,7 +639,7 @@ public abstract class BaseAnalyzer {
         StringBuilder sb = new StringBuilder();
         sb.append(",");
         for (Developer developer : developers) {
-            if (!developer.getIsOrcaDeveloper()) {
+            if (!isDeveloperValid(developer) || !developer.getIsOrcaDeveloper()) {
                 continue;
             }
             sb.append(developer.getName());
@@ -630,14 +648,14 @@ public abstract class BaseAnalyzer {
         bw.write(sb.toString());
         bw.newLine();
         for (Developer developer : developers) {
-            if (!developer.getIsOrcaDeveloper()) {
+            if (!isDeveloperValid(developer) || !developer.getIsOrcaDeveloper()) {
                 continue;
             }
             sb = new StringBuilder();
             sb.append(developer.getName());
             sb.append(",");
             for (Developer iter : developers) {
-                if (!iter.getIsOrcaDeveloper()) {
+                if (!isDeveloperValid(iter) || !iter.getIsOrcaDeveloper()) {
                     continue;
                 }
                 Integer cooperationCount = developer.getCooperationCount().get(iter);
@@ -661,16 +679,25 @@ public abstract class BaseAnalyzer {
         StringBuilder sb = new StringBuilder();
         sb.append(",");
         for (Developer developer : developers) {
+            if (!isDeveloperValid(developer)) {
+                continue;
+            }
             sb.append(developer.getName());
             sb.append(",");
         }
         bw.write(sb.toString());
         bw.newLine();
         for (Developer developer : developers) {
+            if (!isDeveloperValid(developer)) {
+                continue;
+            }
             sb = new StringBuilder();
             sb.append(developer.getName());
             sb.append(",");
             for (Developer iter : developers) {
+                if (!isDeveloperValid(iter)) {
+                    continue;
+                }
                 Integer cooperationCount = developer.getCooperationCount().get(iter);
                 if (cooperationCount == null) {
                     sb.append("");
