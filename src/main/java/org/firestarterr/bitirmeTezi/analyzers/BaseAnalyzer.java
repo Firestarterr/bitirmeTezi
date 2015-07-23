@@ -254,7 +254,7 @@ public abstract class BaseAnalyzer {
 
     //<editor-fold desc="Commit Methods">
     protected Commit createCommit(CommitWrapper parsed) throws ParseException {
-        if (isCommitValid(parsed)) {
+        if (!isCommitValid(parsed)) {
             return null;
         }
         Commit commit = new Commit();
