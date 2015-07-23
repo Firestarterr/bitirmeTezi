@@ -15,7 +15,7 @@ public abstract class BaseGitAnalyzer extends BaseAnalyzer {
     }
 
     protected CommitWrapper parseCommitData(String line) throws ParseException {
-        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM D kk:mm:ss yyyy");
+        SimpleDateFormat sdf = new SimpleDateFormat("EEE MMM d kk:mm:ss yyyy");
 
         CommitWrapper wrapper = new CommitWrapper();
         String[] commitSplit = StringUtils.splitByWholeSeparator(line, "*-*-");
