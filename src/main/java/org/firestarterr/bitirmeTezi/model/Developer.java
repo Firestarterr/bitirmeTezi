@@ -1,15 +1,13 @@
 package org.firestarterr.bitirmeTezi.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class Developer extends BaseEntity {
 
     private Integer locEdited;
     private boolean isOrcaDeveloper;
 
+    private Set<Commit> commitsWithCooperation = new HashSet<>(0);
     private List<Commit> commits = new ArrayList<>(0);
 
     //bu map commit bazında developer coop tutuyor.
@@ -36,6 +34,15 @@ public class Developer extends BaseEntity {
 
     public void setIsOrcaDeveloper(boolean isOrcaDeveloper) {
         this.isOrcaDeveloper = isOrcaDeveloper;
+    }
+
+
+    public Set<Commit> getCommitsWithCooperation() {
+        return commitsWithCooperation;
+    }
+
+    public void setCommitsWithCooperation(Set<Commit> commitsWithCooperation) {
+        this.commitsWithCooperation = commitsWithCooperation;
     }
 
     public List<Commit> getCommits() {
