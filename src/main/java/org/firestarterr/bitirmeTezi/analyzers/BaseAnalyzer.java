@@ -489,9 +489,11 @@ public abstract class BaseAnalyzer {
         exportFileData();
         exportDeveloperData(false);
         exportDeveloperMatrixData(false);
+        exportDeveloperNodeXLData(false);
         if (!isOnlyOrcaDeveloper()) {
             exportDeveloperData(true);
             exportDeveloperMatrixData(true);
+            exportDeveloperNodeXLData(true);
         }
     }
 
@@ -508,7 +510,8 @@ public abstract class BaseAnalyzer {
     }
 
     public void exportDeveloperData(boolean isOrcaOnly) throws IOException {
-        String fileString = isOrcaOnly ? "-orca" : "" + "-developers.csv";
+        String fileString = isOrcaOnly ? "-orca" : "";
+        fileString = fileString + "-developers.csv";
         FileWriter fw = new FileWriter(projects.get(0).getName() + fileString);
         BufferedWriter bw = new BufferedWriter(fw);
         bw.append(getDeveloperDataHeadlines());
@@ -637,7 +640,8 @@ public abstract class BaseAnalyzer {
     }
 
     public void exportDeveloperMatrixData(boolean isOrcaOnly) throws IOException {
-        String fileString = isOrcaOnly ? "-orca" : "" + "-developer-matrix.csv";
+        String fileString = isOrcaOnly ? "-orca" : "";
+        fileString = fileString + "-developer-matrix.csv";
         FileWriter fw = new FileWriter(projects.get(0).getName() + fileString);
         BufferedWriter bw = new BufferedWriter(fw);
         StringBuilder sb = new StringBuilder();
@@ -676,6 +680,48 @@ public abstract class BaseAnalyzer {
         bw.close();
         fw.close();
     }
+
+    public void exportDeveloperNodeXLData(boolean isOrcaOnly) throws IOException {
+        String fileString = isOrcaOnly ? "-orca" : "";
+        fileString = fileString + "-developer-node-xl.csv";
+        FileWriter fw = new FileWriter(projects.get(0).getName() + fileString);
+        BufferedWriter bw = new BufferedWriter(fw);
+        for (Developer developer : developers) {
+            if (!isDeveloperValid(developer) || (isOrcaOnly && !developer.getIsOrcaDeveloper())) {
+                continue;
+            }
+            //Vertex 1	Vertex 2	Color	Width	Style	Opacity	Visibility	Label	Label Text Color	Label Font Size
+
+            for (Map.Entry<Developer, Integer> entry : developer.getCooperationCount().entrySet()) {
+                if (!isDeveloperValid(entry.getKey()) || (isOrcaOnly && !entry.getKey().getIsOrcaDeveloper())) {
+                    continue;
+                }
+                bw.write(developer.getName() + "," + entry.getKey().getName() + "," + (entry.getKey().getIsOrcaDeveloper() ? "blue" : "red") + "," + getVertexWidth(developer, entry.getKey()));
+                bw.newLine();
+            }
+        }
+        bw.close();
+        fw.close();
+    }
+
+    private String getVertexWidth(Developer from, Developer to) {
+        Double min = Double.MAX_VALUE;
+        Double max = Double.MIN_VALUE;
+        for (Map.Entry<Developer, Integer> entry : from.getCooperationCount().entrySet()) {
+            if (min > entry.getValue()) {
+                min = (double) entry.getValue();
+            }
+            if (max < entry.getValue()) {
+                max = (double) entry.getValue();
+            }
+        }
+        if (min.equals(max)) {
+            return "5";
+        }
+        Double calculation = (double) from.getCooperationCount().get(to);
+        return String.valueOf((((calculation - min) * 9) / (max - min)) + 1);
+    }
+
 
     private String buildEntityStaticFieldsString(BaseEntity entity) {
         return entity.getName() + "," + entity.getCreatedDate() + "," + entity.getUpdatedDate() + "," + entity.getRelCreatedDate() + "," + entity.getRelUpdatedDate() + "," + entity.getAge() + "," + entity.getRelAge() + "," + entity.getChangeFrequencyPerDay() + "," + entity.getRelChangeFrequencyPerDay() + ",";
