@@ -16,6 +16,16 @@ import java.util.*;
 
 public abstract class BaseAnalyzer {
 
+    Integer minCooperationCount = Integer.MAX_VALUE;
+    Integer minOrcaCooperationCount = Integer.MAX_VALUE;
+    Integer maxCooperationCount = Integer.MIN_VALUE;
+    Integer maxOrcaCooperationCount = Integer.MIN_VALUE;
+
+    Integer minLocEdited = Integer.MAX_VALUE;
+    Integer minOrcaLocEdited = Integer.MAX_VALUE;
+    Integer maxLocEdited = Integer.MIN_VALUE;
+    Integer maxOrcaLocEdited = Integer.MIN_VALUE;
+
     List<Project> projects = new ArrayList<>();
     List<Package> packages = new ArrayList<>();
     List<Issue> issues = new ArrayList<>();
@@ -465,6 +475,44 @@ public abstract class BaseAnalyzer {
             }
         }
 
+        for (Developer dev : developers) {
+            for (Map.Entry<Developer, Integer> entry : dev.getCooperationCount().entrySet()) {
+                if (minCooperationCount > entry.getValue()) {
+                    minCooperationCount = entry.getValue();
+                }
+                if (isBothOrca(dev, entry.getKey())) {
+                    if (minOrcaCooperationCount > entry.getValue()) {
+                        minOrcaCooperationCount = entry.getValue();
+                    }
+                }
+                if (maxCooperationCount < entry.getValue()) {
+                    maxCooperationCount = entry.getValue();
+                }
+                if (isBothOrca(dev, entry.getKey())) {
+                    if (maxOrcaCooperationCount < entry.getValue()) {
+                        maxOrcaCooperationCount = entry.getValue();
+                    }
+                }
+            }
+
+            if (minLocEdited > dev.getLocEdited()) {
+                minLocEdited = dev.getLocEdited();
+            }
+            if (dev.getIsOrcaDeveloper()) {
+                if (minOrcaLocEdited > dev.getLocEdited()) {
+                    minOrcaLocEdited = dev.getLocEdited();
+                }
+            }
+            if (maxLocEdited < dev.getLocEdited()) {
+                maxLocEdited = dev.getLocEdited();
+            }
+            if (dev.getIsOrcaDeveloper()) {
+                if (maxOrcaLocEdited < dev.getLocEdited()) {
+                    maxOrcaLocEdited = dev.getLocEdited();
+                }
+            }
+        }
+
         for (File file : files) {
             if (fileExtMap.containsKey(file.getFileExt())) {
                 fileExtMap.get(file.getFileExt()).add(file);
@@ -489,24 +537,23 @@ public abstract class BaseAnalyzer {
         exportFileData();
         exportDeveloperData(false);
         exportDeveloperMatrixData(false);
-        exportDeveloperNodeXLData(false);
+        exportDeveloperNodeXLVertices(false);
+        exportDeveloperNodeXLEdges(false);
         if (!isOnlyOrcaDeveloper()) {
             exportDeveloperData(true);
             exportDeveloperMatrixData(true);
-            exportDeveloperNodeXLData(true);
+            exportDeveloperNodeXLVertices(true);
+            exportDeveloperNodeXLEdges(true);
         }
     }
 
     private String getDeveloperDataHeadlines() {
         return "isim,ilk işlem tarihi,son işlem tarihi,relatif ilk işlem tarihi,relatif son işlem tarihi,yaş,relatif yaş," +
-                "değişim sıklığı,relatif değişim sıklığı,iş birliği yapılmış commit sayısı,commit sayısı,yapılan toplam iş birliği,iş birliği yapılmış commitlenen dosya sayisi,commitlenen dosya sayisi,iş birliği yapılmış dosya sayısı,dosya başına yapılmış iş birliği ortalaması," +
+                "değişim sıklığı,relatif değişim sıklığı,iş birliği yapılmış commit sayısı,commit sayısı, iş birliği yapılmış commitin tümüne oranı,yapılan toplam iş birliği," +
+                "iş birliği yapılmış commitlenen dosya sayisi,commitlenen dosya sayisi, iş birliği yapılmış commitlenen dosya sayısının tümüne oranı," +
+                "iş birliği yapılmış dosya sayısı,dosya başına yapılmış iş birliği ortalaması," +
                 "iş birliği yapılmış modül sayısı,modül başına yapılmış iş birliği ortalaması,iş birliği yapılmış geliştirici sayısı," +
-                "geliştirici başına yapılmış iş birliği ortalaması,değiştirilmiş dosya sayısı toplamı,commit başına  değiştirilmiş dosya ortalaması," +
-                "ölçeklendirilmiş değişim sıklığı,ölçeklendirilmiş commit sayısı,ölçeklendirilmiş yapılan toplam iş birliği," +
-                "ölçeklendirilmiş iş birliği yapılmış dosya sayısı,ölçeklendirilmiş dosya başına yapılmış iş birliği ortalaması," +
-                "ölçeklendirilmiş iş birliği yapılmış modül sayısı,ölçeklendirilmiş modül başına yapılmış iş birliği ortalaması," +
-                "ölçeklendirilmiş iş birliği yapılmış geliştirici sayısı,ölçeklendirilmiş geliştirici başına yapılmış iş birliği ortalaması," +
-                "ölçeklendirilmiş değiştirilmiş dosya sayısı toplamı,ölçeklendirilmiş commit başına  değiştirilmiş dosya ortalaması";
+                "geliştirici başına yapılmış iş birliği ortalaması,değiştirilmiş dosya sayısı toplamı,commit başına  değiştirilmiş dosya ortalaması,";
     }
 
     public void exportDeveloperData(boolean isOrcaOnly) throws IOException {
@@ -526,6 +573,9 @@ public abstract class BaseAnalyzer {
             sb.append(",");
             sb.append(dev.getCommits().size());
             sb.append(",");
+            Double oran = ((double) dev.getCommitsWithCooperation().size()) / ((double) dev.getCommits().size());
+            sb.append(oran);
+            sb.append(",");
 
             Double totalCoop = 0D;
             for (Map.Entry<Developer, Integer> entry : dev.getCooperationCount().entrySet()) {
@@ -534,16 +584,16 @@ public abstract class BaseAnalyzer {
             sb.append(totalCoop);
             sb.append(",");
 
-            Double totalFileCoperated = 0D;
+            Double totalFileCooperated = 0D;
             for (Commit commit : dev.getCommits()) {
                 for (File file : commit.getFiles()) {
                     if (dev.getCooperatedOnFiles().containsKey(file)) {
-                        totalFileCoperated++;
+                        totalFileCooperated++;
                     }
                 }
             }
 
-            sb.append(totalFileCoperated);
+            sb.append(totalFileCooperated);
             sb.append(",");
 
             Double totalFileCommited = 0D;
@@ -552,6 +602,9 @@ public abstract class BaseAnalyzer {
             }
 
             sb.append(totalFileCommited);
+            sb.append(",");
+
+            sb.append(totalFileCooperated / totalFileCommited);
             sb.append(",");
 
             sb.append(dev.getCooperatedOnFiles().keySet().size());
@@ -681,9 +734,26 @@ public abstract class BaseAnalyzer {
         fw.close();
     }
 
-    public void exportDeveloperNodeXLData(boolean isOrcaOnly) throws IOException {
+    public void exportDeveloperNodeXLVertices(boolean isOrcaOnly) throws IOException {
         String fileString = isOrcaOnly ? "-orca" : "";
-        fileString = fileString + "-developer-node-xl.csv";
+        fileString = fileString + "-developer-vertices-xl.csv";
+        FileWriter fw = new FileWriter(projects.get(0).getName() + fileString);
+        BufferedWriter bw = new BufferedWriter(fw);
+        for (Developer developer : developers) {
+            if (!isDeveloperValid(developer) || (isOrcaOnly && !developer.getIsOrcaDeveloper())) {
+                continue;
+            }
+            //Vertex	Color	Shape	Size	Opacity	Image File	Visibility	Label
+            bw.write(developer.getName() + "," + (developer.getIsOrcaDeveloper() ? "blue" : "red") + "," + "," + (getVertexSize(developer.getLocEdited(), isOrcaOnly)) + "," + "," + "," + "," + developer.getName());
+            bw.newLine();
+        }
+        bw.close();
+        fw.close();
+    }
+
+    public void exportDeveloperNodeXLEdges(boolean isOrcaOnly) throws IOException {
+        String fileString = isOrcaOnly ? "-orca" : "";
+        fileString = fileString + "-developer-edges-xl.csv";
         FileWriter fw = new FileWriter(projects.get(0).getName() + fileString);
         BufferedWriter bw = new BufferedWriter(fw);
         for (Developer developer : developers) {
@@ -691,12 +761,12 @@ public abstract class BaseAnalyzer {
                 continue;
             }
             //Vertex 1	Vertex 2	Color	Width	Style	Opacity	Visibility	Label	Label Text Color	Label Font Size
-
             for (Map.Entry<Developer, Integer> entry : developer.getCooperationCount().entrySet()) {
                 if (!isDeveloperValid(entry.getKey()) || (isOrcaOnly && !entry.getKey().getIsOrcaDeveloper())) {
                     continue;
                 }
-                bw.write(developer.getName() + "," + entry.getKey().getName() + "," + (entry.getKey().getIsOrcaDeveloper() ? "blue" : "red") + "," + getVertexWidth(developer, entry.getKey()));
+                boolean isBothOrca = isBothOrca(entry.getKey(), developer);
+                bw.write(developer.getName() + "," + entry.getKey().getName() + "," + (isBothOrca ? "blue" : "red") + "," + getVertexWidth(entry.getValue(), isOrcaOnly));
                 bw.newLine();
             }
         }
@@ -704,24 +774,41 @@ public abstract class BaseAnalyzer {
         fw.close();
     }
 
-    private String getVertexWidth(Developer from, Developer to) {
-        Double min = Double.MAX_VALUE;
-        Double max = Double.MIN_VALUE;
-        for (Map.Entry<Developer, Integer> entry : from.getCooperationCount().entrySet()) {
-            if (min > entry.getValue()) {
-                min = (double) entry.getValue();
+    private String getVertexSize(Integer locEdited, boolean isOrcaOnly) {
+        if (isOrcaOnly) {
+            if (minOrcaLocEdited.equals(maxOrcaLocEdited)) {
+                return "500";
             }
-            if (max < entry.getValue()) {
-                max = (double) entry.getValue();
+            Double calculation = Double.valueOf(locEdited);
+            return String.valueOf((((calculation - minOrcaLocEdited) * 999) / (maxOrcaLocEdited - minOrcaLocEdited)) + 1);
+        } else {
+            if (minLocEdited.equals(maxLocEdited)) {
+                return "500";
             }
+            Double calculation = Double.valueOf(locEdited);
+            return String.valueOf((((calculation - minLocEdited) * 999) / (maxLocEdited - minLocEdited)) + 1);
         }
-        if (min.equals(max)) {
-            return "5";
-        }
-        Double calculation = (double) from.getCooperationCount().get(to);
-        return String.valueOf((((calculation - min) * 9) / (max - min)) + 1);
     }
 
+    private String getVertexWidth(Integer cooperationCount, boolean isOrcaOnly) {
+        if (isOrcaOnly) {
+            if (minOrcaCooperationCount.equals(maxOrcaCooperationCount)) {
+                return "5";
+            }
+            Double calculation = Double.valueOf(cooperationCount);
+            return String.valueOf((((calculation - minOrcaCooperationCount) * 9) / (maxOrcaCooperationCount - minOrcaCooperationCount)) + 1);
+        } else {
+            if (minCooperationCount.equals(maxCooperationCount)) {
+                return "5";
+            }
+            Double calculation = Double.valueOf(cooperationCount);
+            return String.valueOf((((calculation - minCooperationCount) * 9) / (maxCooperationCount - minCooperationCount)) + 1);
+        }
+    }
+
+    private boolean isBothOrca(Developer dev1, Developer dev2) {
+        return dev1.getIsOrcaDeveloper() && dev2.getIsOrcaDeveloper();
+    }
 
     private String buildEntityStaticFieldsString(BaseEntity entity) {
         return entity.getName() + "," + entity.getCreatedDate() + "," + entity.getUpdatedDate() + "," + entity.getRelCreatedDate() + "," + entity.getRelUpdatedDate() + "," + entity.getAge() + "," + entity.getRelAge() + "," + entity.getChangeFrequencyPerDay() + "," + entity.getRelChangeFrequencyPerDay() + ",";
