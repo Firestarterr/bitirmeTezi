@@ -115,7 +115,7 @@ public abstract class BaseAnalyzer {
             return null;
         }
         for (File file : files) {
-            if (file.getName().equals(parsed.name)) {
+            if (file.getName().equals(parsed.name) && file.getFullPath().equals(parsed.path)) {
                 updateStats(file, date, isOrcaDeveloper);
                 return file;
             }
@@ -340,7 +340,6 @@ public abstract class BaseAnalyzer {
             file.getModule().setLocEdited(file.getModule().getLocEdited() + locEdited);
         }
     }
-    //</editor-fold>
 
     private boolean isCommitContainsCooperation(Commit commit) {
         for (File file : commit.getFiles()) {
@@ -350,7 +349,9 @@ public abstract class BaseAnalyzer {
         }
         return false;
     }
+    //</editor-fold>
 
+    //<editor-fold desc="Analyze Methods">
     public void analyzeData() {
         for (Commit commit : commitSuccess) {
             Developer dev = commit.getDeveloper();
@@ -531,6 +532,7 @@ public abstract class BaseAnalyzer {
         }
         sortDevelopers();
     }
+    //</editor-fold>
 
     //<editor-fold desc="Report Methods">
     public void produceReports() throws IOException {
@@ -547,6 +549,13 @@ public abstract class BaseAnalyzer {
         }
     }
 
+    private String getFileDataHeadlines() {
+        return "isim,ilk işlem tarihi,son işlem tarihi,relatif ilk işlem tarihi," +
+                "relatif son işlem tarihi,yaş,relatif yaş,değişim sıklığı,relatif değişim sıklığı," +
+                "full dizin,dosya uzantısı,modül,en çok commit yapan geliştirici,değişen satır sayısı," +
+                "yapılan commit sayısı,commit başına değişen satır sayısı";
+    }
+
     private String getDeveloperDataHeadlines() {
         return "isim,ilk işlem tarihi,son işlem tarihi,relatif ilk işlem tarihi,relatif son işlem tarihi,yaş,relatif yaş," +
                 "değişim sıklığı,relatif değişim sıklığı,iş birliği yapılmış commit sayısı,commit sayısı, iş birliği yapılmış commitin tümüne oranı,yapılan toplam iş birliği," +
@@ -556,12 +565,13 @@ public abstract class BaseAnalyzer {
                 "geliştirici başına yapılmış iş birliği ortalaması,değiştirilmiş dosya sayısı toplamı,commit başına  değiştirilmiş dosya ortalaması,";
     }
 
+
     public void exportDeveloperData(boolean isOrcaOnly) throws IOException {
         String fileString = isOrcaOnly ? "-orca" : "";
         fileString = fileString + "-developers.csv";
         FileWriter fw = new FileWriter(projects.get(0).getName() + fileString);
         BufferedWriter bw = new BufferedWriter(fw);
-        bw.append(getDeveloperDataHeadlines());
+        bw.write(getDeveloperDataHeadlines());
         bw.newLine();
         for (Developer dev : developers) {
             if (!isDeveloperValid(dev) || (isOrcaOnly && !dev.getIsOrcaDeveloper())) {
@@ -648,6 +658,7 @@ public abstract class BaseAnalyzer {
     public void exportFileData() throws IOException {
         FileWriter fw = new FileWriter(projects.get(0).getName() + "-files.csv");
         BufferedWriter bw = new BufferedWriter(fw);
+        bw.write(getFileDataHeadlines());
         bw.newLine();
         for (File file : files) {
             StringBuilder sb = new StringBuilder();
