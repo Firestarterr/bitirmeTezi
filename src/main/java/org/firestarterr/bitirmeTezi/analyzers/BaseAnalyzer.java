@@ -550,19 +550,49 @@ public abstract class BaseAnalyzer {
     }
 
     private String getFileDataHeadlines() {
-        return "isim,ilk işlem tarihi,son işlem tarihi,relatif ilk işlem tarihi," +
-                "relatif son işlem tarihi,yaş,relatif yaş,değişim sıklığı,relatif değişim sıklığı," +
-                "full dizin,dosya uzantısı,modül,en çok commit yapan geliştirici,değişen satır sayısı," +
-                "yapılan commit sayısı,commit başına değişen satır sayısı";
+        return "isim," +
+                "ilk işlem tarihi," +
+                "son işlem tarihi," +
+                "orca geliştiricilerinin ilk işlem tarihi," +
+                "orca geliştiricilerinin son işlem tarihi," +
+                "yaş," +
+                "orca geliştiricilerine göre yaş," +
+                "kod veritabanı kaydı değişikliği sıklığı," +
+                "orca geliştiricilerinin kod veritabanı kaydı değişikliği sıklığı," +
+                "dosya dizini," +
+                "dosya uzantısı," +
+                "modül," +
+                "en çok kod üzerinde çalışmış olan geliştirici," +
+                "değişen satır sayısı toplamı," +
+                "yapılan kod veritabanı kaydı sayısı," +
+                "kod veritabanı kaydı başına değişen ortalama satır sayısı";
     }
 
     private String getDeveloperDataHeadlines() {
-        return "isim,ilk işlem tarihi,son işlem tarihi,relatif ilk işlem tarihi,relatif son işlem tarihi,yaş,relatif yaş," +
-                "değişim sıklığı,relatif değişim sıklığı,iş birliği yapılmış commit sayısı,commit sayısı, iş birliği yapılmış commitin tümüne oranı,yapılan toplam iş birliği," +
-                "iş birliği yapılmış commitlenen dosya sayisi,commitlenen dosya sayisi, iş birliği yapılmış commitlenen dosya sayısının tümüne oranı," +
-                "iş birliği yapılmış dosya sayısı,dosya başına yapılmış iş birliği ortalaması," +
-                "iş birliği yapılmış modül sayısı,modül başına yapılmış iş birliği ortalaması,iş birliği yapılmış geliştirici sayısı," +
-                "geliştirici başına yapılmış iş birliği ortalaması,değiştirilmiş dosya sayısı toplamı,commit başına  değiştirilmiş dosya ortalaması,";
+        return "isim," +
+                "ilk işlem tarihi," +
+                "son işlem tarihi," +
+                "orca geliştiricilerinin ilk işlem tarihi," +
+                "orca geliştiricilerinin son işlem tarihi," +
+                "yaş," +
+                "orca geliştiricilerine göre yaş," +
+                "kod veritabanı kaydı değişikliği sıklığı," +
+                "orca geliştiricilerinin kod veritabanı kaydı değişikliği sıklığı," +
+                "iş birliği yapılmış kod veritabanı değişikliği," +
+                "toplam kod veritabanı değişikliği," +
+                "iş birliği yapılmış kod veritabanı değişikliğinin toplam kod veritabanı değişikliğine oranı," +
+                "toplam yapılan iş birliği sayısı," +
+                "iş birliği yapılmış dosya sayısı," +
+                "toplam üzerinde çalışılmış dosya sayısı," +
+                "iş birliği yapılmış dosya sayısının üzerinde çalışılmış toplam dosya sayısına oranı," +
+                "iş birliği yapılmış özgün dosya sayısı," +
+                "özgün dosya başına yapılmış iş birliği ortalaması," +
+                "iş birliği yapılmış toplam modül sayısı," +
+                "modül başına yapılmış iş birliği ortalaması," +
+                "iş birliği yapılmış geliştirici sayısı," +
+                "geliştirici başına yapılmış iş birliği ortalaması," +
+                "satır sayısı değişikliği," +
+                "kod veritabanı kaydı başına değiştirilmiş satır sayısı ortalaması";
     }
 
 
